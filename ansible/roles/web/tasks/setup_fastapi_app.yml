@@ -1,0 +1,20 @@
+---
+
+- name: Install packages required by the Fastapi app inside virtualenv
+  pip:
+    virtualenv: "{{ virtualenv_path }}"
+    requirements: "{{ requirements_file }}"
+    extra_args: "{{ pip_use_upgrade_flag | ternary('--upgrade', omit) }}"
+
+- name: Copy .env to server
+  template: src=env.j2
+            dest={{ project_path }}/.env
+            backup=yes
+
+- name: Run database migrations
+  shell: |
+    source {{ virtualenv_path }}/bin/activate
+    cd {{ project_path }}
+    alembic upgrade head
+  args:
+    executable: /bin/bash

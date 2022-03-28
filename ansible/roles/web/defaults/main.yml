@@ -1,0 +1,12 @@
+---
+
+# Virtualenv settings.
+virtualenv_python_version: "{{ base_python_package }}"
+recreate_virtualenv: false
+
+# Environment variables.
+environment_vars:
+  SECRET_KEY: "{{ app_secret_key }}"
+  DATABASE_URL: "postgresql+asyncpg://{{ db_user }}:{{ db_password }}@{{ db_host }}:{{ db_port }}/{{ db_name }}"
+  APP_ENV: "{{ app_env }}"
+  DEBUG: "{{ app_debug }}"

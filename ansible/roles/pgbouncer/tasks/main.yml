@@ -1,0 +1,78 @@
+---
+
+- name: Install PGBouncer
+  apt: name=pgbouncer update_cache={{ update_apt_cache }} state=present
+  tags: packages
+
+- name: Create "/var/log/postgresql/" directory with necessary privileges
+  file:
+    dest: "/var/log/postgresql/"
+    owner: "{{ pgbouncer_user }}"
+    group: "{{ pgbouncer_group }}"
+    mode: 0755
+    state: directory
+
+- name: Divert pgbouncer main configuration file {{ pgbouncer_confdir }}/pgbouncer.ini
+  command: dpkg-divert --quiet --local --divert {{ pgbouncer_confdir }}/pgbouncer.ini.dpkg-divert --rename {{ pgbouncer_confdir }}/pgbouncer.ini
+  args:
+    creates: "{{ pgbouncer_confdir }}/pgbouncer.ini.dpkg-divert"
+
+- name: pgbouncer update restart witness
+  template:
+    src: "pgbouncer.ini.restart-witness.j2"
+    dest: "{{ pgbouncer_confdir }}/.pgbouncer.ini.restart-witness"
+    owner: "{{ pgbouncer_user }}"
+    group: "{{ pgbouncer_group }}"
+    mode: 0600
+  notify:
+    - restart pgbouncer
+
+- name: pgbouncer main configuration file {{ pgbouncer_confdir }}/pgbouncer.ini
+  template:
+    src: pgbouncer.ini.j2
+    dest: "{{ pgbouncer_confdir }}/pgbouncer.ini"
+    owner: "{{ pgbouncer_user }}"
+    group: "{{ pgbouncer_group }}"
+    mode: 0640
+  notify:
+    - reload pgbouncer
+
+- name: Divert pgbouncer user list file {{ pgbouncer_confdir }}/userlist.txt
+  command: dpkg-divert --quiet --local --divert {{ pgbouncer_confdir }}/userlist.txt.dpkg-divert --rename {{ pgbouncer_confdir }}/userlist.txt
+  args:
+    creates: "{{ pgbouncer_confdir }}/userlist.txt.dpkg-divert"
+
+- name: add users to userlist.txt
+  copy:
+    dest: "{{ pgbouncer_confdir }}/userlist.txt"
+    owner: "{{ pgbouncer_user }}"
+    group: "{{ pgbouncer_group }}"
+    mode: 0640
+    content: |
+      "stats" "passwordless"
+      {% for user in pgbouncer_users %}
+      "{{ user.name }}" "md5{{ (user.pass + user.name) | hash('md5') }}"
+      {% endfor %}
+  notify:
+    - reload pgbouncer
+
+- name: Divert pgbouncer default file /etc/default/pgbouncer
+  command: dpkg-divert --quiet --local --divert /etc/default/pgbouncer.dpkg-divert --rename /etc/default/pgbouncer
+  args:
+    creates: "/etc/default/pgbouncer.dpkg-divert"
+
+- name: pgbouncer default file /etc/default/pgbouncer
+  template:
+    src: pgbouncer_default.j2
+    dest: "/etc/default/pgbouncer"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  notify:
+    - restart pgbouncer
+
+- name: ensure pgbouncer is running
+  service:
+    name: pgbouncer
+    state: started
+

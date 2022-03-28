@@ -1,0 +1,9 @@
+[webservers]
+frankfurt_app_1 ansible_host=127.0.0.1
+
+[dbservers]
+frankfurt_db_1 ansible_host=127.0.0.1
+
+[all_groups:children]
+webservers
+dbservers

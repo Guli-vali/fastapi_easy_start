@@ -1,0 +1,21 @@
+---
+
+- name: start pgbouncer
+  service:
+    name: pgbouncer
+    state: started
+
+- name: stop pgbouncer
+  service:
+    name: pgbouncer
+    state: stopped
+
+- name: restart pgbouncer
+  service:
+    name: pgbouncer
+    state: restarted
+
+- name: reload pgbouncer
+  service:
+    name: pgbouncer
+    state: reloaded

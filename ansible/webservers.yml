@@ -1,0 +1,15 @@
+---
+
+- name: Provision application web server
+  hosts: webservers
+  become: true
+  vars:
+    update_apt_cache: true
+  module_defaults:
+    apt:
+      force_apt_get: true
+  roles:
+    - base
+    - web
+    - nginx
+    - certbot

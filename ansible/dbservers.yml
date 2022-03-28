@@ -1,0 +1,14 @@
+---
+
+- name: Provision database servers
+  hosts: dbservers
+  become: true
+  vars:
+    update_apt_cache: true
+  module_defaults:
+    apt:
+      force_apt_get: true
+  roles:
+    - base
+    - db
+    - pgbouncer

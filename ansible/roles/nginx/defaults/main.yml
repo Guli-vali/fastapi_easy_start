@@ -1,0 +1,5 @@
+---
+
+nginx_server_name: "{{ inventory_hostname }}"
+nginx_strong_dh_group: true  # Strongly recomended in production. See weakdh.org.
+nginx_use_letsencrypt: false

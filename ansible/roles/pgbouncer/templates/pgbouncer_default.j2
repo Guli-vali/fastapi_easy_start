@@ -1,0 +1,10 @@
+# Set to 1 after you've configured pgbouncer in
+# /etc/pgbouncer
+
+START={{ pgbouncer_daemon_start }}
+
+# It is possible to change the options the daemon is started with.
+# The default setting is shown below, uncomment and apply your changes
+# if you need to modify it.
+
+OPTS="{{ pgbouncer_daemon_opts }}"

@@ -1,0 +1,9 @@
+- name: Install additional packages
+  apt:
+    update_cache: "{{ update_apt_cache }}"
+    state: present
+    name:
+      - libcurl4-gnutls-dev
+      - gnutls-dev
+      - libpq-dev
+      - python3-dev

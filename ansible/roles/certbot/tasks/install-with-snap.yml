@@ -1,0 +1,36 @@
+---
+- name: Ensure snapd is installed.
+  package:
+    name: snapd
+    state: present
+  register: snapd_install
+
+- name: Ensure snapd is enabled.
+  systemd:
+    name: snapd.socket
+    enabled: true
+    state: started
+
+- name: Update snap after install.
+  shell: snap install core; snap refresh core
+  changed_when: true
+  failed_when: false
+  when: snapd_install is changed
+
+- name: Install certbot via snap.
+  snap:
+    name: certbot
+    classic: true
+
+- name: Symlink certbot into place.
+  file:
+    src: /snap/bin/certbot
+    dest: /usr/bin/certbot
+    state: link
+
+- name: Set Certbot script variable.
+  set_fact:
+    certbot_script: /usr/bin/certbot
+
+- name: Update nginx with ssl
+  shell: "{{ certbot_script }} --nginx --noninteractive --agree-tos --email {{ letsencrypt_email }} -d {{ domain_name }}"

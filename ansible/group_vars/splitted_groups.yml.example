@@ -1,0 +1,59 @@
+# ----------------------- all_groups.yaml ------------------------------
+
+# ROOT user
+ansible_user: ubuntu
+
+# SSH auth
+
+# ansible_ssh_private_key_file:-----BEGIN RSA PRIVATE KEY----- {{PASS KEY HERE}}-----END RSA PRIVATE KEY-----
+ansible_ssh_private_key_file: ~/.ssh/macbook-pro-m1.pem
+
+# Database settings
+db_host: localhost
+db_port: 5432
+db_user: travellers
+db_name: travellers
+db_password: password
+
+
+
+# ----------------------- webservers.yaml ------------------------------
+
+# Application settings.
+project_name: babylon escape
+application_name: fastapi_server
+virtualenv_path: "/webapps/{{ application_name }}"
+project_path: "{{ virtualenv_path }}/{{ project_name }}"
+pip_use_upgrade_flag: false
+
+requirements_file: "{{ project_path }}/requirements.txt"
+app_secret_key: "the most scariest secret of babylon"
+app_debug: true
+app_env: dev
+
+application_log_dir: "{{ virtualenv_path }}/logs"
+application_log_file: "{{ application_log_dir }}/gunicorn_supervisor.log"
+
+# Gunicorn settings.
+gunicorn_num_workers: 3
+gunicorn_max_requests: 0.
+gunicorn_user: "{{ application_name }}"
+gunicorn_group: webapps
+
+# Git
+git_repo: https://username:token@gitlab.com/username/project_name.git
+git_branch: main
+ssh_forward_agent: true
+setup_git_repo: true
+git_token: example_token
+
+# Nginx and Let's encrypt!
+letsencrypt_email: example@example.com
+domain_name: example.com
+
+
+
+# ----------------------- dbservers.yaml ------------------------------
+
+postgresql_user: postgres
+postgresql_group: postgres

@@ -1,0 +1,33 @@
+---
+
+postgresql_user: '{{ postgresql_user }}'
+postgresql_group: '{{ postgresql_group }}'
+
+# `md5` or `scram-sha-256` (https://www.postgresql.org/docs/10/auth-methods.html)
+postgresql_auth_method: md5
+
+postgresql_unix_socket_directories:
+  - /var/run/postgresql
+
+
+# Global configuration options that will be set in postgresql.conf.
+postgresql_global_config_options:
+  - option: unix_socket_directories
+    value: '{{ postgresql_unix_socket_directories | join(",") }}'
+  - option: password_encryption
+    value: '{{ postgresql_auth_method }}'
+
+# Host based authentication (hba) entries to be added to the pg_hba.conf. This
+# variable's defaults reflect the defaults that come with a fresh installation.
+postgresql_hba_entries:
+  - {type: local, database: all, user: postgres, auth_method: peer}
+  - {type: local, database: all, user: all, auth_method: peer}
+  - {type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: "{{ postgresql_auth_method }}"}
+  - {type: host, database: all, user: all, address: '::1/128', auth_method: "{{ postgresql_auth_method }}"}
+
+# Debian only. Used to generate the locales used by PostgreSQL databases.
+postgresql_locales:
+  - 'en_US.UTF-8'
+
+postgresql_version: 14
+postgresql_config_path: "/etc/postgresql/{{ postgresql_version }}/main"

@@ -1,0 +1,21 @@
+---
+certbot_auto_renew_user: "{{ ansible_user }}"
+certbot_auto_renew_hour: "3"
+certbot_auto_renew_minute: "30"
+certbot_auto_renew_options: "--quiet --no-self-upgrade"
+
+certbot_create_command: >-
+  {{ certbot_script }} certonly --{{ certbot_create_method  }}
+  {{ '--hsts' if certbot_hsts else '' }}
+  {{ '--test-cert' if certbot_testmode else '' }}
+  --noninteractive --agree-tos
+  --email {{ cert_item.email | default(certbot_admin_email) }}
+  {{ '--webroot-path ' if certbot_create_method == 'webroot'  else '' }}
+  {{ cert_item.webroot | default(certbot_webroot) if certbot_create_method == 'webroot' else '' }}
+  -d {{ cert_item.domains | join(',') }}
+  {{ '--pre-hook /etc/letsencrypt/renewal-hooks/pre/stop_services'
+    if certbot_create_standalone_stop_services
+  else '' }}
+  {{ '--post-hook /etc/letsencrypt/renewal-hooks/post/start_services'
+    if certbot_create_standalone_stop_services
+  else '' }}

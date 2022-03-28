@@ -1,0 +1,32 @@
+---
+
+pgbouncer_databases:
+  - name: "*"
+    host: '{{ db_host }}'
+    port: '{{ db_port }}'
+
+pgbouncer_users:
+  - name: '{{ db_user }}'
+    pass: '{{ db_password }}'
+
+pgbouncer_confdir: /etc/pgbouncer
+pgbouncer_daemon_opts: -d {{ pgbouncer_confdir }}/pgbouncer.ini
+pgbouncer_daemon_start: 1
+pgbouncer_user: '{{ postgresql_user }}'
+pgbouncer_group: '{{ postgresql_group }}'
+
+pgbouncer_logfile: /var/log/postgresql/pgbouncer.log
+pgbouncer_pidfile: /var/run/postgresql/pgbouncer.pid
+pgbouncer_listen_addr: 127.0.0.1
+pgbouncer_listen_port: 6432
+pgbouncer_unix_socket_dir: /var/run/postgresql
+pgbouncer_unix_socket_mode: 0755
+pgbouncer_unix_socket_group: '{{ pgbouncer_group }}'
+# allow ident logins for admin and stats as the postgres user
+pgbouncer_auth_type: md5
+pgbouncer_auth_file: /etc/pgbouncer/userlist.txt
+
+
+pgbouncer_admin_users:
+  - postgres
+  - '{{ postgresql_user }}'
